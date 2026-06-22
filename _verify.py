@@ -25,9 +25,9 @@ with sync_playwright() as p:
     units = page.locator("details.unit").count()
     check("4 units render", units == 4)
 
-    # 3. Total task cards == 37 (our TASKS length)
+    # 3. Total task cards == 39 (our TASKS length)
     cards = page.locator(".card").count()
-    check("37 task cards render", cards == 37)
+    check("39 task cards render", cards == 39)
 
     # 4. A project (Greetings) is LOCKED initially (its watch not done)
     greet = page.locator("#cbx-u1-build-greetings")
