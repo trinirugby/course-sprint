@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#1B1F3B" />
+<meta name="description" content="Course Sprint — a sequenced checklist to speed-run an ICS4U Java course." />
+<title>Course Sprint · ICS4U Java</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --bg:#1B1F3B;        /* deep indigo canvas */
+    --bg-2:#232845;      /* card */
+    --bg-3:#2C3157;      /* raised / track */
+    --ink:#EEF1FF;       /* soft white */
+    --muted:#9AA3C7;     /* secondary text */
+    --teal:#2DD4BF;      /* the one bold accent */
+    --teal-deep:#14B8A6;
+    --teal-dim:rgba(45,212,191,.14);
+    --line:rgba(255,255,255,.08);
+    --locked:#6B7299;
+    --radius:16px;
+    --maxw:680px;
+    --ease:cubic-bezier(.2,.7,.3,1);
+  }
+
+  *{box-sizing:border-box;}
+  html{-webkit-text-size-adjust:100%;}
+  body{
+    margin:0;
+    background:
+      radial-gradient(1200px 600px at 50% -10%, #242a52 0%, rgba(36,42,82,0) 60%),
+      var(--bg);
+    color:var(--ink);
+    font-family:"Inter",system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+    line-height:1.5;
+    min-height:100vh;
+    padding-bottom:max(40px,env(safe-area-inset-bottom));
+  }
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 16px;}
+
+  h1,h2,h3,.num{font-family:"Space Grotesk",system-ui,sans-serif;letter-spacing:-.01em;}
+
+  a{color:var(--teal);}
+
+  /* ---------- Dashboard ---------- */
+  .dash{
+    position:sticky;top:0;z-index:20;
+    background:linear-gradient(180deg, rgba(27,31,59,.96), rgba(27,31,59,.86));
+    backdrop-filter:blur(10px);
+    -webkit-backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);
+    padding:max(14px,env(safe-area-inset-top)) 0 14px;
+  }
+  .dash-row{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;}
+  .dash h1{margin:0;font-size:1.45rem;font-weight:700;}
+  .dash-sub{margin:2px 0 0;color:var(--muted);font-size:.85rem;}
+  .dash-sub strong{color:var(--ink);font-weight:600;}
+  .dash-pct{font-family:"Space Grotesk",sans-serif;font-weight:700;font-size:2.1rem;line-height:1;color:var(--teal);white-space:nowrap;}
+
+  .bar{height:8px;background:var(--bg-3);border-radius:999px;overflow:hidden;margin-top:12px;}
+  .bar-lg{height:12px;}
+  .bar-fill{
+    height:100%;width:0%;border-radius:999px;
+    background:linear-gradient(90deg,var(--teal-deep),var(--teal));
+    box-shadow:0 0 14px rgba(45,212,191,.55);
+    transition:width .55s var(--ease);
+  }
+
+  .next-btn{
+    margin-top:14px;width:100%;min-height:52px;
+    display:flex;align-items:center;justify-content:center;gap:8px;
+    font-family:"Space Grotesk",sans-serif;font-weight:600;font-size:1rem;
+    color:#06251F;background:linear-gradient(180deg,var(--teal),var(--teal-deep));
+    border:0;border-radius:14px;cursor:pointer;
+    box-shadow:0 8px 22px -8px rgba(45,212,191,.6);
+    transition:transform .12s var(--ease), box-shadow .2s var(--ease), filter .2s;
+  }
+  .next-btn:hover{filter:brightness(1.05);}
+  .next-btn:active{transform:translateY(1px) scale(.995);}
+  .next-btn:focus-visible{outline:3px solid #BdF8EF;outline-offset:2px;}
+  .next-btn[disabled]{
+    background:var(--bg-3);color:var(--muted);
+    box-shadow:none;cursor:default;
+  }
+
+  /* ---------- Units ---------- */
+  .units{margin-top:22px;display:flex;flex-direction:column;gap:16px;}
+  .unit{
+    background:var(--bg-2);border:1px solid var(--line);
+    border-radius:var(--radius);overflow:hidden;
+  }
+  .unit[open]{box-shadow:0 14px 40px -28px rgba(0,0,0,.8);}
+  .unit-head{
+    list-style:none;cursor:pointer;padding:16px 18px;display:block;
+    transition:background .15s;
+  }
+  .unit-head::-webkit-details-marker{display:none;}
+  .unit-head:hover{background:var(--bg-3);}
+  .unit-head:focus-visible{outline:3px solid var(--teal);outline-offset:-3px;}
+  .unit-head-top{display:flex;align-items:baseline;gap:10px;}
+  .unit-kicker{
+    font-family:"Space Grotesk",sans-serif;font-weight:700;font-size:.72rem;
+    text-transform:uppercase;letter-spacing:.14em;color:var(--teal);
+  }
+  .unit-title{font-family:"Space Grotesk",sans-serif;font-weight:600;font-size:1.05rem;flex:1;}
+  .unit-count{color:var(--muted);font-size:.82rem;font-variant-numeric:tabular-nums;}
+  .chev{color:var(--muted);transition:transform .25s var(--ease);font-size:.8rem;}
+  .unit[open] .chev{transform:rotate(90deg);}
+
+  .unit-body{padding:4px 12px 14px;}
+  .lesson{
+    font-family:"Space Grotesk",sans-serif;font-weight:600;font-size:.74rem;
+    text-transform:uppercase;letter-spacing:.1em;color:var(--muted);
+    padding:14px 6px 6px;
+  }
+
+  /* ---------- Task card ---------- */
+  .card{
+    background:rgba(255,255,255,.015);
+    border:1px solid var(--line);border-radius:13px;
+    margin:7px 0;padding:12px 14px;
+    transition:border-color .2s, background .2s, opacity .2s, box-shadow .3s;
+  }
+  .card.done{border-color:rgba(45,212,191,.35);background:var(--teal-dim);}
+  .card.locked{opacity:.62;}
+  .card.flash{box-shadow:0 0 0 3px var(--teal), 0 0 26px rgba(45,212,191,.55);animation:pulse 1.3s var(--ease);}
+
+  .card-row{display:flex;align-items:flex-start;gap:13px;min-height:34px;}
+
+  /* native checkbox kept accessible but visually replaced */
+  .cbx{position:absolute;opacity:0;width:1px;height:1px;pointer-events:none;}
+  .tick-label{
+    flex:none;width:30px;height:30px;border-radius:9px;
+    border:2px solid var(--locked);
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;color:transparent;font-weight:700;font-size:1rem;
+    transition:background .18s var(--ease),border-color .18s,color .12s,transform .12s var(--ease);
+    user-select:none;-webkit-tap-highlight-color:transparent;
+  }
+  .tick-label:hover{border-color:var(--teal);}
+  .cbx:checked + .tick-label{
+    background:var(--teal);border-color:var(--teal);color:#06251F;
+    box-shadow:0 0 16px rgba(45,212,191,.6);
+    animation:pop .32s var(--ease);
+  }
+  .cbx:focus-visible + .tick-label{outline:3px solid var(--teal);outline-offset:2px;}
+  .cbx:disabled + .tick-label{cursor:not-allowed;border-color:var(--locked);opacity:.5;}
+
+  .card-text{flex:1;min-width:0;}
+  .badge{
+    display:inline-flex;align-items:center;gap:5px;
+    font-family:"Space Grotesk",sans-serif;font-weight:600;font-size:.66rem;
+    text-transform:uppercase;letter-spacing:.08em;
+    padding:3px 8px;border-radius:999px;margin-bottom:5px;
+    background:var(--bg-3);color:var(--muted);
+  }
+  .badge-watch{color:#7DD3FC;background:rgba(125,211,252,.12);}
+  .badge-build{color:#FBBF77;background:rgba(251,191,119,.12);}
+  .badge-submit{color:#F0A6C9;background:rgba(240,166,201,.12);}
+  .badge-install{color:#A8B4FF;background:rgba(168,180,255,.12);}
+  .badge-read{color:#C4B5FD;background:rgba(196,181,253,.12);}
+
+  .title{display:block;font-weight:500;font-size:.97rem;color:var(--ink);cursor:pointer;}
+  .card.done .title{color:var(--muted);text-decoration:line-through;text-decoration-color:rgba(45,212,191,.6);}
+
+  .res{
+    display:inline-flex;align-items:center;gap:6px;margin-top:7px;
+    font-size:.85rem;text-decoration:none;font-weight:500;
+    color:var(--teal);
+  }
+  .res:hover{text-decoration:underline;}
+  .res-muted{color:var(--muted);font-weight:400;cursor:default;}
+  .res-muted:hover{text-decoration:none;}
+
+  .lock-hint{display:block;margin-top:7px;font-size:.8rem;color:var(--locked);}
+  .card:not(.locked) .lock-hint{display:none;}
+
+  footer{color:var(--muted);font-size:.78rem;text-align:center;padding:26px 16px 10px;}
+  footer .reset{color:var(--muted);text-decoration:underline;background:none;border:0;cursor:pointer;font:inherit;}
+
+  @keyframes pop{0%{transform:scale(.7)}55%{transform:scale(1.18)}100%{transform:scale(1)}}
+  @keyframes pulse{0%{box-shadow:0 0 0 3px var(--teal),0 0 30px rgba(45,212,191,.7)}100%{box-shadow:0 0 0 3px rgba(45,212,191,0),0 0 0 rgba(45,212,191,0)}}
+
+  @media (max-width:420px){
+    .dash h1{font-size:1.25rem;}
+    .dash-pct{font-size:1.7rem;}
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation:none !important;transition:none !important;scroll-behavior:auto !important;}
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="dash">
+      <div class="dash-row">
+        <div>
+          <h1>Course Sprint</h1>
+          <p class="dash-sub" id="dashSub">Loading your run…</p>
+        </div>
+        <div class="dash-pct" id="overallPct">0%</div>
+      </div>
+      <div class="bar bar-lg"><div class="bar-fill" id="overallFill"></div></div>
+      <button class="next-btn" id="nextBtn" type="button">⚡ Next task</button>
+    </header>
+
+    <main class="units" id="units" aria-live="polite"></main>
+
+    <footer>
+      Progress saves on this device only.
+      <button class="reset" id="resetBtn" type="button">Reset all progress</button>
+    </footer>
+  </div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ===================== DATA MODEL ===================== */
+  // Task definitions are kept SEPARATE from progress so this list can be
+  // edited later without wiping a student's saved ticks (progress is keyed by id).
+  // `locked` is computed at render time, never stored.
+  const TASKS = [
+    /* ===== UNIT 1 — Basic Programming ===== */
+    { id:"u1-install-jdk", unit:1, lesson:"Setup", type:"install",
+      title:"Install the JDK (Java Development Kit)",
+      resource:{ label:"Adoptium Temurin JDK — download (Windows)", url:"https://adoptium.net/temurin/releases/?os=windows" } },
+    { id:"u1-install-netbeans", unit:1, lesson:"Setup", type:"install",
+      title:"Install Apache NetBeans",
+      resource:{ label:"Apache NetBeans — download", url:"https://netbeans.apache.org/front/main/download/" } },
+
+    { id:"u1-watch-variables", unit:1, lesson:"Variables & Types", type:"watch",
+      title:"Learn variables & data types",
+      resource:{ label:"Bro Code — Variables in Java (12 min)", url:"https://www.youtube.com/watch?v=so1iUWaLmKA" } },
+
+    { id:"u1-watch-io", unit:1, lesson:"Input & Output", type:"watch",
+      title:"Learn input & output (Scanner, println)",
+      resource:{ label:"Bro Code — Accept user input (8 min)", url:"https://www.youtube.com/watch?v=wAEPokhj5Q4" } },
+    { id:"u1-build-greetings", unit:1, lesson:"Input & Output", type:"build",
+      title:"Project: Greetings — read a name, print a greeting",
+      resource:{ label:"Build it in NetBeans", url:null } },
+
+    { id:"u1-watch-ifelse", unit:1, lesson:"If / Else", type:"watch",
+      title:"Learn if / else conditionals",
+      resource:{ label:"Bro Code — Java if statements (6 min)", url:"https://www.youtube.com/watch?v=MY03bt_0JQI" } },
+    { id:"u1-build-rollercoaster", unit:1, lesson:"If / Else", type:"build",
+      title:"Project: Roller Coaster Ride — height check with if/else",
+      resource:{ label:"Build it in NetBeans", url:null } },
+
+    { id:"u1-watch-loops", unit:1, lesson:"Loops", type:"watch",
+      title:"Learn loops (while & for)",
+      resource:{ label:"Bro Code — Java while loop", url:"https://www.youtube.com/watch?v=t6gmQaTMTtM" } },
+    { id:"u1-build-sleeptimer", unit:1, lesson:"Loops", type:"build",
+      title:"Project: Sleep Timer — count down with a loop",
+      resource:{ label:"Build it in NetBeans", url:null } },
+
+    { id:"u1-watch-methods", unit:1, lesson:"Methods", type:"watch",
+      title:"Learn methods",
+      resource:{ label:"Bro Code — Java methods explained (10+ min)", url:"https://www.youtube.com/watch?v=v5p_SUfi710" } },
+
+    { id:"u1-watch-gui", unit:1, lesson:"Intro to GUI", type:"watch",
+      title:"Intro to GUI (Java Swing)",
+      resource:{ label:"Bro Code — Java GUI (Swing)", url:"https://www.youtube.com/watch?v=7GaAW-DdPuI" } },
+    { id:"u1-build-calculator", unit:1, lesson:"Intro to GUI", type:"build",
+      title:"Project: My Calculator — GUI calc (fix the decimal button!)",
+      resource:{ label:"Build it in NetBeans", url:null } },
+
+    /* ===== UNIT 2 — Arrays / Game Design ===== */
+    { id:"u2-watch-arrays1d", unit:2, lesson:"1D Arrays", type:"watch",
+      title:"Learn 1D arrays",
+      resource:{ label:"Bro Code — Java arrays in 9 minutes", url:"https://www.youtube.com/watch?v=9dr2mHYYoug" } },
+    { id:"u2-build-integersum", unit:2, lesson:"1D Arrays", type:"build",
+      title:"Project: Integer Sum — total the values in an array",
+      resource:{ label:"Build it in NetBeans", url:null } },
+
+    { id:"u2-watch-arrays2d", unit:2, lesson:"2D Arrays", type:"watch",
+      title:"Learn 2D arrays",
+      resource:{ label:"Bro Code — Java 2D arrays", url:"https://www.youtube.com/watch?v=alwukGslBG8" } },
+    { id:"u2-build-tictactoe", unit:2, lesson:"2D Arrays", type:"build",
+      title:"Project: Tic Tac Toe — 2D-array game board",
+      resource:{ label:"Build it in NetBeans", url:null } },
+
+    { id:"u2-watch-arraylist", unit:2, lesson:"ArrayLists", type:"watch",
+      title:"Learn ArrayLists",
+      resource:{ label:"Bro Code — Java ArrayList", url:"https://www.youtube.com/watch?v=1nRj4ALuw7A" } },
+    { id:"u2-build-employee", unit:2, lesson:"ArrayLists", type:"build",
+      title:"Project: Employee Records — store records in an ArrayList",
+      resource:{ label:"Build it in NetBeans", url:null } },
+
+    { id:"u2-read-review", unit:2, lesson:"Unit 2 Test", type:"read",
+      title:"Review: arrays, 2D arrays & ArrayLists",
+      resource:{ label:"Go back over your notes & projects", url:null } },
+    { id:"u2-submit-test", unit:2, lesson:"Unit 2 Test", type:"submit",
+      title:"Unit 2 Test",
+      resource:{ label:"Complete & submit the Unit 2 test", url:null } },
+
+    /* ===== UNIT 3 — Advanced Java ===== */
+    { id:"u3-watch-recursion", unit:3, lesson:"Recursion", type:"watch",
+      title:"Learn recursion",
+      resource:{ label:"Coding with John — Recursion full tutorial", url:"https://www.youtube.com/watch?v=k-7jJP7QFEM" } },
+    { id:"u3-build-fraction", unit:3, lesson:"Recursion", type:"build",
+      title:"Project: Fraction Reducer — reduce fractions with recursion",
+      resource:{ label:"Build it in NetBeans", url:null } },
+
+    { id:"u3-watch-binarysearch", unit:3, lesson:"Binary Search", type:"watch",
+      title:"Learn binary search",
+      resource:{ label:"Bro Code — Binary Search in 10 minutes", url:"https://www.youtube.com/watch?v=xrMppTpoqdw" } },
+    { id:"u3-build-booksearch", unit:3, lesson:"Binary Search", type:"build",
+      title:"Project: Book Search — find a title with binary search",
+      resource:{ label:"Build it in NetBeans", url:null } },
+
+    { id:"u3-watch-sorting", unit:3, lesson:"Sorting", type:"watch",
+      title:"Learn sorting routines",
+      resource:{ label:"Bro Code — Bubble Sort in 7 minutes", url:"https://www.youtube.com/watch?v=Dv4qLJcxus8" } },
+    { id:"u3-build-sorting", unit:3, lesson:"Sorting", type:"build",
+      title:"Project: implement a sorting routine",
+      resource:{ label:"Build it in NetBeans", url:null } },
+
+    { id:"u3-watch-xml", unit:3, lesson:"XML", type:"watch",
+      title:"Reading XML in Java",
+      resource:{ label:"Read an XML file in Java (DOM parser)", url:"https://www.youtube.com/watch?v=Ejb91k2nlRI" } },
+    { id:"u3-build-carsxml", unit:3, lesson:"XML", type:"build",
+      title:"Project: cars.xml GUI — load car data from XML",
+      resource:{ label:"Build it in NetBeans", url:null } },
+
+    { id:"u3-read-careers", unit:3, lesson:"Careers", type:"read",
+      title:"Explore Java careers & job search",
+      resource:{ label:"Research Java career paths & job postings", url:null } },
+
+    { id:"u3-read-review", unit:3, lesson:"Unit 3 Test", type:"read",
+      title:"Review: recursion, search, sorting & XML",
+      resource:{ label:"Go back over your notes & projects", url:null } },
+    { id:"u3-submit-test", unit:3, lesson:"Unit 3 Test", type:"submit",
+      title:"Unit 3 Test",
+      resource:{ label:"Complete & submit the Unit 3 test", url:null } },
+
+    /* ===== UNIT 4 — Software Cycle / Summative ===== */
+    { id:"u4-watch-sdlc", unit:4, lesson:"Final Summative Project", type:"watch",
+      title:"Intro to the software development cycle",
+      resource:{ label:"Bro Code — Software Development Lifecycle (9 min)", url:"https://www.youtube.com/watch?v=i-QyW8D3ei0" } },
+    { id:"u4-read-idea", unit:4, lesson:"Final Summative Project", type:"read",
+      title:"Choose your final project idea",
+      resource:{ label:"Pick a project & write a one-line goal", url:null } },
+    { id:"u4-build-design", unit:4, lesson:"Final Summative Project", type:"build",
+      title:"Design & development — plan it (flowchart / pseudocode)",
+      resource:{ label:"Sketch your design", url:null } },
+    { id:"u4-build-implement", unit:4, lesson:"Final Summative Project", type:"build",
+      title:"Implementation — build your project",
+      resource:{ label:"Build it in NetBeans", url:null } },
+    { id:"u4-build-testing", unit:4, lesson:"Final Summative Project", type:"build",
+      title:"Testing & verification — make sure it works",
+      resource:{ label:"Test every feature", url:null } },
+    { id:"u4-submit-summative", unit:4, lesson:"Final Summative Project", type:"submit",
+      title:"Submit your final summative",
+      resource:{ label:"Hand in your final project", url:null } },
+  ];
+
+  const UNITS = [
+    { n:1, title:"Basic Programming" },
+    { n:2, title:"Arrays / Game Design" },
+    { n:3, title:"Advanced Java" },
+    { n:4, title:"Software Cycle / Summative" },
+  ];
+
+  const TYPE_META = {
+    install:{ icon:"⬇", label:"Install" },
+    watch:  { icon:"▶", label:"Watch" },
+    read:   { icon:"📖", label:"Read" },
+    build:  { icon:"🔨", label:"Build" },
+    submit: { icon:"🚩", label:"Submit" },
+  };
+
+  /* ===================== PROGRESS STATE ===================== */
+  const STORE_KEY = "courseSprint.done.v1";
+  const byId = {};
+  TASKS.forEach(function(t){ byId[t.id] = t; });
+
+  function loadDone(){
+    try{
+      var raw = localStorage.getItem(STORE_KEY);
+      if(!raw) return new Set();
+      var arr = JSON.parse(raw);
+      return new Set(Array.isArray(arr) ? arr : []);
+    }catch(e){ return new Set(); }
+  }
+  function saveDone(){
+    try{ localStorage.setItem(STORE_KEY, JSON.stringify(Array.from(done))); }catch(e){}
+  }
+  var done = loadDone();
+
+  /* ===================== LOCK LOGIC ===================== */
+  // A build/submit task is locked until every watch/read task in the SAME
+  // (unit, lesson) is done. A completed task is never shown as locked.
+  function lessonGuards(unit, lesson){
+    return TASKS.filter(function(t){
+      return t.unit === unit && t.lesson === lesson && (t.type === "watch" || t.type === "read");
+    });
+  }
+  function isLocked(t){
+    if(done.has(t.id)) return false;
+    if(t.type !== "build" && t.type !== "submit") return false;
+    return lessonGuards(t.unit, t.lesson).some(function(g){ return !done.has(g.id); });
+  }
+  function nextTask(){
+    for(var i=0;i<TASKS.length;i++){
+      var t = TASKS[i];
+      if(!done.has(t.id) && !isLocked(t)) return t;
+    }
+    return null;
+  }
+
+  /* ===================== RENDER ===================== */
+  var unitsEl = document.getElementById("units");
+
+  function esc(s){ return String(s).replace(/[&<>"]/g, function(c){
+    return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c];
+  }); }
+
+  function resourceHtml(t){
+    if(!t.resource) return "";
+    var r = t.resource;
+    if(r.url){
+      return '<a class="res" href="'+esc(r.url)+'" target="_blank" rel="noopener noreferrer">'+esc(r.label)+' ↗</a>';
+    }
+    return '<span class="res res-muted">'+esc(r.label)+'</span>';
+  }
+
+  function cardHtml(t){
+    var meta = TYPE_META[t.type];
+    var isDone = done.has(t.id);
+    var locked = isLocked(t);
+    return ''+
+      '<div class="card'+(isDone?' done':'')+(locked?' locked':'')+'" id="card-'+t.id+'">'+
+        '<div class="card-row">'+
+          '<input type="checkbox" class="cbx" id="cbx-'+t.id+'" data-id="'+t.id+'"'+
+             (isDone?' checked':'')+(locked?' disabled':'')+'>'+
+          '<label class="tick-label" for="cbx-'+t.id+'" aria-hidden="true">✓</label>'+
+          '<div class="card-text">'+
+            '<span class="badge badge-'+t.type+'">'+meta.icon+' '+meta.label+'</span>'+
+            '<label class="title" for="cbx-'+t.id+'">'+esc(t.title)+'</label>'+
+            resourceHtml(t)+
+            '<span class="lock-hint">🔒 finish the lessons above first</span>'+
+          '</div>'+
+        '</div>'+
+      '</div>';
+  }
+
+  function unitHtml(u){
+    var tasks = TASKS.filter(function(t){ return t.unit === u.n; });
+    var total = tasks.length;
+    var doneCount = tasks.filter(function(t){ return done.has(t.id); }).length;
+    var pct = total ? Math.round(doneCount/total*100) : 0;
+
+    var body = "", lastLesson = null;
+    tasks.forEach(function(t){
+      if(t.lesson !== lastLesson){
+        body += '<div class="lesson">'+esc(t.lesson)+'</div>';
+        lastLesson = t.lesson;
+      }
+      body += cardHtml(t);
+    });
+
+    return ''+
+      '<details class="unit" id="unit-'+u.n+'" open>'+
+        '<summary class="unit-head">'+
+          '<div class="unit-head-top">'+
+            '<span class="unit-kicker">Unit '+u.n+'</span>'+
+            '<span class="unit-title">'+esc(u.title)+'</span>'+
+            '<span class="unit-count" id="count-'+u.n+'">'+doneCount+'/'+total+'</span>'+
+            '<span class="chev">▶</span>'+
+          '</div>'+
+          '<div class="bar"><div class="bar-fill" id="fill-'+u.n+'" style="width:'+pct+'%"></div></div>'+
+        '</summary>'+
+        '<div class="unit-body">'+body+'</div>'+
+      '</details>';
+  }
+
+  function buildAll(){
+    unitsEl.innerHTML = UNITS.map(unitHtml).join("");
+    updateProgress();
+  }
+
+  /* ===================== LIVE UPDATES (no full re-render on tick) ===================== */
+  function updateProgress(){
+    var totalDone = TASKS.filter(function(t){ return done.has(t.id); }).length;
+    var pct = Math.round(totalDone/TASKS.length*100);
+    document.getElementById("overallPct").textContent = pct + "%";
+    document.getElementById("overallFill").style.width = pct + "%";
+
+    UNITS.forEach(function(u){
+      var tasks = TASKS.filter(function(t){ return t.unit === u.n; });
+      var dc = tasks.filter(function(t){ return done.has(t.id); }).length;
+      var p = tasks.length ? Math.round(dc/tasks.length*100) : 0;
+      var fill = document.getElementById("fill-"+u.n);
+      var cnt = document.getElementById("count-"+u.n);
+      if(fill) fill.style.width = p + "%";
+      if(cnt) cnt.textContent = dc + "/" + tasks.length;
+    });
+
+    var nt = nextTask();
+    var sub = document.getElementById("dashSub");
+    var btn = document.getElementById("nextBtn");
+    if(nt){
+      var u = UNITS.find(function(x){ return x.n === nt.unit; });
+      sub.innerHTML = 'On now · <strong>Unit '+nt.unit+': '+esc(u.title)+'</strong>';
+      btn.disabled = false;
+      btn.textContent = "⚡ Next task";
+    } else if(totalDone === TASKS.length){
+      sub.innerHTML = '🎉 <strong>Course complete — every task done.</strong>';
+      btn.disabled = true;
+      btn.textContent = "🎉 All done";
+    } else {
+      sub.innerHTML = 'Keep going — unlock the next project above.';
+      btn.disabled = true;
+      btn.textContent = "Finish a lesson to continue";
+    }
+  }
+
+  // When a watch/read task changes, re-evaluate the locks for its lesson's
+  // build/submit cards so they unlock (or re-lock) live.
+  function refreshLessonLocks(unit, lesson){
+    TASKS.filter(function(t){
+      return t.unit === unit && t.lesson === lesson && (t.type === "build" || t.type === "submit");
+    }).forEach(function(t){
+      var card = document.getElementById("card-"+t.id);
+      var cbx = document.getElementById("cbx-"+t.id);
+      if(!card || !cbx) return;
+      var locked = isLocked(t);
+      card.classList.toggle("locked", locked);
+      cbx.disabled = locked;
+    });
+  }
+
+  function handleTick(id, checked){
+    if(checked) done.add(id); else done.delete(id);
+    saveDone();
+
+    var t = byId[id];
+    var card = document.getElementById("card-"+id);
+    if(card) card.classList.toggle("done", checked);
+
+    if(t.type === "watch" || t.type === "read"){
+      refreshLessonLocks(t.unit, t.lesson);
+    }
+    updateProgress();
+  }
+
+  /* ===================== EVENTS ===================== */
+  var prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  unitsEl.addEventListener("change", function(e){
+    var el = e.target;
+    if(el && el.classList.contains("cbx")){
+      // Guard: a disabled (locked) box should never toggle.
+      if(el.disabled){ el.checked = false; return; }
+      handleTick(el.getAttribute("data-id"), el.checked);
+    }
+  });
+
+  document.getElementById("nextBtn").addEventListener("click", function(){
+    var t = nextTask();
+    if(!t) return;
+    var unitEl = document.getElementById("unit-"+t.unit);
+    if(unitEl && !unitEl.open) unitEl.open = true;
+    var card = document.getElementById("card-"+t.id);
+    if(card){
+      card.scrollIntoView({ behavior: prefersReduced ? "auto" : "smooth", block: "center" });
+      card.classList.remove("flash");
+      // force reflow so the animation restarts on repeat clicks
+      void card.offsetWidth;
+      card.classList.add("flash");
+    }
+  });
+
+  document.getElementById("resetBtn").addEventListener("click", function(){
+    if(!confirm("Reset all progress on this device? This can't be undone.")) return;
+    done = new Set();
+    saveDone();
+    buildAll();
+    window.scrollTo({ top:0, behavior: prefersReduced ? "auto" : "smooth" });
+  });
+
+  /* ===================== INIT ===================== */
+  buildAll();
+})();
+</script>
+</body>
+</html>
