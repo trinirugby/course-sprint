@@ -85,6 +85,12 @@
     background:var(--bg-3);color:var(--muted);
     box-shadow:none;cursor:default;
   }
+  .playlist-link{
+    display:block;text-align:center;margin-top:10px;
+    font-size:.82rem;font-weight:500;color:var(--muted);text-decoration:none;
+  }
+  .playlist-link:hover{color:var(--teal);text-decoration:underline;}
+  .playlist-link:focus-visible{outline:3px solid var(--teal);outline-offset:3px;border-radius:6px;}
 
   /* ---------- Units ---------- */
   .units{margin-top:22px;display:flex;flex-direction:column;gap:16px;}
@@ -206,6 +212,7 @@
       </div>
       <div class="bar bar-lg"><div class="bar-fill" id="overallFill"></div></div>
       <button class="next-btn" id="nextBtn" type="button">⚡ Next task</button>
+      <a class="playlist-link" href="https://www.youtube.com/playlist?list=PLZPZq0r_RZOOj_NOZYq_R2PECIMglLemc" target="_blank" rel="noopener noreferrer">📺 Course playlist · Bro Code Java ↗</a>
     </header>
 
     <main class="units" id="units" aria-live="polite"></main>
@@ -241,36 +248,36 @@
 
     { id:"u1-watch-variables", unit:1, lesson:"Variables & Types", type:"watch",
       title:"Learn variables & data types",
-      resource:{ label:"Bro Code — Variables in Java (12 min)", url:"https://www.youtube.com/watch?v=so1iUWaLmKA" } },
+      resource:{ label:"Playlist #2 · Java variables", url:"https://www.youtube.com/watch?v=TGVLmr194DI&list=PLZPZq0r_RZOOj_NOZYq_R2PECIMglLemc" } },
 
     { id:"u1-watch-io", unit:1, lesson:"Input & Output", type:"watch",
       title:"Learn input & output (Scanner, println)",
-      resource:{ label:"Bro Code — Accept user input (8 min)", url:"https://www.youtube.com/watch?v=wAEPokhj5Q4" } },
+      resource:{ label:"Playlist #3 · User input in Java", url:"https://www.youtube.com/watch?v=RAthlOQUMkc&list=PLZPZq0r_RZOOj_NOZYq_R2PECIMglLemc" } },
     { id:"u1-build-greetings", unit:1, lesson:"Input & Output", type:"build",
       title:"Project: Greetings — read a name, print a greeting",
       resource:{ label:"Build it in VS Code", url:null } },
 
     { id:"u1-watch-ifelse", unit:1, lesson:"If / Else", type:"watch",
       title:"Learn if / else conditionals",
-      resource:{ label:"Bro Code — Java if statements (6 min)", url:"https://www.youtube.com/watch?v=MY03bt_0JQI" } },
+      resource:{ label:"Playlist #7 · Java if statements", url:"https://www.youtube.com/watch?v=Q_ll-EKocuI&list=PLZPZq0r_RZOOj_NOZYq_R2PECIMglLemc" } },
     { id:"u1-build-rollercoaster", unit:1, lesson:"If / Else", type:"build",
       title:"Project: Roller Coaster Ride — height check with if/else",
       resource:{ label:"Build it in VS Code", url:null } },
 
     { id:"u1-watch-loops", unit:1, lesson:"Loops", type:"watch",
       title:"Learn loops (while & for)",
-      resource:{ label:"Bro Code — Java while loop", url:"https://www.youtube.com/watch?v=t6gmQaTMTtM" } },
+      resource:{ label:"Playlist #21 · Java while loops (for loops follow)", url:"https://www.youtube.com/watch?v=ZjHJrmYknrk&list=PLZPZq0r_RZOOj_NOZYq_R2PECIMglLemc" } },
     { id:"u1-build-sleeptimer", unit:1, lesson:"Loops", type:"build",
       title:"Project: Sleep Timer — count down with a loop",
       resource:{ label:"Build it in VS Code", url:null } },
 
     { id:"u1-watch-methods", unit:1, lesson:"Methods", type:"watch",
       title:"Learn methods",
-      resource:{ label:"Bro Code — Java methods explained (10+ min)", url:"https://www.youtube.com/watch?v=v5p_SUfi710" } },
+      resource:{ label:"Playlist #26 · Methods in Java", url:"https://www.youtube.com/watch?v=JKecvKiNX2I&list=PLZPZq0r_RZOOj_NOZYq_R2PECIMglLemc" } },
 
     { id:"u1-watch-gui", unit:1, lesson:"Intro to GUI", type:"watch",
       title:"Intro to GUI (Java Swing)",
-      resource:{ label:"Bro Code — Java GUI (Swing)", url:"https://www.youtube.com/watch?v=7GaAW-DdPuI" } },
+      resource:{ label:"Bro Code — Java GUI (Swing) · not in the playlist", url:"https://www.youtube.com/watch?v=7GaAW-DdPuI" } },
     { id:"u1-build-calculator", unit:1, lesson:"Intro to GUI", type:"build",
       title:"Project: My Calculator — GUI calc (fix the decimal button!)",
       resource:{ label:"GUI project — VS Code (hand-code Swing) or NetBeans for the visual builder", url:null } },
@@ -278,21 +285,21 @@
     /* ===== UNIT 2 — Arrays / Game Design ===== */
     { id:"u2-watch-arrays1d", unit:2, lesson:"1D Arrays", type:"watch",
       title:"Learn 1D arrays",
-      resource:{ label:"Bro Code — Java arrays in 9 minutes", url:"https://www.youtube.com/watch?v=9dr2mHYYoug" } },
+      resource:{ label:"Playlist #31 · Java arrays", url:"https://www.youtube.com/watch?v=9dr2mHYYoug&list=PLZPZq0r_RZOOj_NOZYq_R2PECIMglLemc" } },
     { id:"u2-build-integersum", unit:2, lesson:"1D Arrays", type:"build",
       title:"Project: Integer Sum — total the values in an array",
       resource:{ label:"Build it in VS Code", url:null } },
 
     { id:"u2-watch-arrays2d", unit:2, lesson:"2D Arrays", type:"watch",
       title:"Learn 2D arrays",
-      resource:{ label:"Bro Code — Java 2D arrays", url:"https://www.youtube.com/watch?v=alwukGslBG8" } },
+      resource:{ label:"Playlist #35 · Java 2D arrays", url:"https://www.youtube.com/watch?v=Qf3Nczxm2AY&list=PLZPZq0r_RZOOj_NOZYq_R2PECIMglLemc" } },
     { id:"u2-build-tictactoe", unit:2, lesson:"2D Arrays", type:"build",
       title:"Project: Tic Tac Toe — 2D-array game board",
       resource:{ label:"Build it in VS Code", url:null } },
 
     { id:"u2-watch-arraylist", unit:2, lesson:"ArrayLists", type:"watch",
       title:"Learn ArrayLists",
-      resource:{ label:"Bro Code — Java ArrayList", url:"https://www.youtube.com/watch?v=1nRj4ALuw7A" } },
+      resource:{ label:"Playlist #56 · Java ArrayLists", url:"https://www.youtube.com/watch?v=wsTSREgCE5E&list=PLZPZq0r_RZOOj_NOZYq_R2PECIMglLemc" } },
     { id:"u2-build-employee", unit:2, lesson:"ArrayLists", type:"build",
       title:"Project: Employee Records — store records in an ArrayList",
       resource:{ label:"Build it in VS Code", url:null } },
@@ -307,28 +314,28 @@
     /* ===== UNIT 3 — Advanced Java ===== */
     { id:"u3-watch-recursion", unit:3, lesson:"Recursion", type:"watch",
       title:"Learn recursion",
-      resource:{ label:"Coding with John — Recursion full tutorial", url:"https://www.youtube.com/watch?v=k-7jJP7QFEM" } },
+      resource:{ label:"Coding with John — Recursion full tutorial · not in the playlist", url:"https://www.youtube.com/watch?v=k-7jJP7QFEM" } },
     { id:"u3-build-fraction", unit:3, lesson:"Recursion", type:"build",
       title:"Project: Fraction Reducer — reduce fractions with recursion",
       resource:{ label:"Build it in VS Code", url:null } },
 
     { id:"u3-watch-binarysearch", unit:3, lesson:"Binary Search", type:"watch",
       title:"Learn binary search",
-      resource:{ label:"Bro Code — Binary Search in 10 minutes", url:"https://www.youtube.com/watch?v=xrMppTpoqdw" } },
+      resource:{ label:"Bro Code — Binary Search in 10 minutes · not in the playlist", url:"https://www.youtube.com/watch?v=xrMppTpoqdw" } },
     { id:"u3-build-booksearch", unit:3, lesson:"Binary Search", type:"build",
       title:"Project: Book Search — find a title with binary search",
       resource:{ label:"Build it in VS Code", url:null } },
 
     { id:"u3-watch-sorting", unit:3, lesson:"Sorting", type:"watch",
       title:"Learn sorting routines",
-      resource:{ label:"Bro Code — Bubble Sort in 7 minutes", url:"https://www.youtube.com/watch?v=Dv4qLJcxus8" } },
+      resource:{ label:"Bro Code — Bubble Sort in 7 minutes · not in the playlist", url:"https://www.youtube.com/watch?v=Dv4qLJcxus8" } },
     { id:"u3-build-sorting", unit:3, lesson:"Sorting", type:"build",
       title:"Project: implement a sorting routine",
       resource:{ label:"Build it in VS Code", url:null } },
 
     { id:"u3-watch-xml", unit:3, lesson:"XML", type:"watch",
       title:"Reading XML in Java",
-      resource:{ label:"Read an XML file in Java (DOM parser)", url:"https://www.youtube.com/watch?v=Ejb91k2nlRI" } },
+      resource:{ label:"Read an XML file in Java (DOM parser) · not in the playlist", url:"https://www.youtube.com/watch?v=Ejb91k2nlRI" } },
     { id:"u3-build-carsxml", unit:3, lesson:"XML", type:"build",
       title:"Project: cars.xml GUI — load car data from XML",
       resource:{ label:"GUI project — VS Code (hand-code Swing) or NetBeans for the visual builder", url:null } },
@@ -347,7 +354,7 @@
     /* ===== UNIT 4 — Software Cycle / Summative ===== */
     { id:"u4-watch-sdlc", unit:4, lesson:"Final Summative Project", type:"watch",
       title:"Intro to the software development cycle",
-      resource:{ label:"Bro Code — Software Development Lifecycle (9 min)", url:"https://www.youtube.com/watch?v=i-QyW8D3ei0" } },
+      resource:{ label:"Bro Code — Software Development Lifecycle (9 min) · not in the playlist", url:"https://www.youtube.com/watch?v=i-QyW8D3ei0" } },
     { id:"u4-read-idea", unit:4, lesson:"Final Summative Project", type:"read",
       title:"Choose your final project idea",
       resource:{ label:"Pick a project & write a one-line goal", url:null } },

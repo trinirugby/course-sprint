@@ -84,6 +84,16 @@ with sync_playwright() as p:
     after = page.locator("#cbx-u2-build-tictactoe").is_checked()
     check("locked task not togglable via label", before == after == False)
 
+    # 13. Playlist integration: dashboard link present + 8 watch tasks wired into the playlist
+    PL = "PLZPZq0r_RZOOj_NOZYq_R2PECIMglLemc"
+    plink = page.locator("a.playlist-link")
+    check("dashboard playlist link present", plink.count() == 1 and PL in (plink.get_attribute("href") or ""))
+    in_playlist = 0
+    for i in range(links.count()):
+        if PL in (links.nth(i).get_attribute("href") or ""):
+            in_playlist += 1
+    check("8 watch tasks wired into the playlist", in_playlist == 8)
+
     page.screenshot(path=r"C:\Users\taylo\course-sprint\_verify_mobile.png", full_page=True)
     browser.close()
 
