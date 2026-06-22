@@ -184,6 +184,13 @@
   .lock-hint{display:block;margin-top:7px;font-size:.8rem;color:var(--locked);}
   .card:not(.locked) .lock-hint{display:none;}
 
+  .file-chip{
+    display:flex;align-items:center;gap:6px;margin-top:8px;width:fit-content;max-width:100%;
+    font-family:ui-monospace,"Cascadia Code",Consolas,monospace;font-size:.78rem;
+    color:#Bfe8ff;background:rgba(125,211,252,.10);
+    border:1px solid rgba(125,211,252,.22);border-radius:7px;padding:4px 9px;
+  }
+
   /* ---------- Step-by-step (expandable per task) ---------- */
   .steps{margin-top:10px;}
   .steps>summary{
@@ -642,6 +649,36 @@
       ] },
   ];
 
+  // Each task that involves writing/running code maps to a ready-made starter file
+  // in the local "java-course" workspace (see the folder created on this device).
+  const FILES = {
+    "u1-watch-variables":"unit1/Variables.java",
+    "u1-watch-io":"unit1/UserInput.java",
+    "u1-build-greetings":"unit1/Greetings.java",
+    "u1-watch-ifelse":"unit1/IfElse.java",
+    "u1-build-rollercoaster":"unit1/RollerCoaster.java",
+    "u1-watch-loops":"unit1/Loops.java",
+    "u1-build-sleeptimer":"unit1/SleepTimer.java",
+    "u1-watch-methods":"unit1/Methods.java",
+    "u1-watch-gui":"unit1/GuiIntro.java",
+    "u1-build-calculator":"unit1/MyCalculator.java",
+    "u2-watch-arrays1d":"unit2/Arrays1D.java",
+    "u2-build-integersum":"unit2/IntegerSum.java",
+    "u2-watch-arrays2d":"unit2/Arrays2D.java",
+    "u2-build-tictactoe":"unit2/TicTacToe.java",
+    "u2-watch-arraylist":"unit2/ArrayLists.java",
+    "u2-build-employee":"unit2/EmployeeRecords.java",
+    "u3-watch-recursion":"unit3/Recursion.java",
+    "u3-build-fraction":"unit3/FractionReducer.java",
+    "u3-watch-binarysearch":"unit3/BinarySearch.java",
+    "u3-build-booksearch":"unit3/BookSearch.java",
+    "u3-watch-sorting":"unit3/Sorting.java",
+    "u3-build-sorting":"unit3/SortDemo.java",
+    "u3-watch-xml":"unit3/ReadXml.java",
+    "u3-build-carsxml":"unit3/CarsXml.java",
+    "u4-build-implement":"unit4/FinalProject.java",
+  };
+
   const UNITS = [
     { n:1, title:"Basic Programming" },
     { n:2, title:"Arrays / Game Design" },
@@ -726,6 +763,14 @@
     return '<span class="res res-muted">'+esc(r.label)+'</span>';
   }
 
+  function fileHtml(t){
+    var f = FILES[t.id];
+    if(!f) return "";
+    return '<span class="file-chip" title="Open this file in your java-course workspace">'+
+             '📂 java-course/'+esc(f)+
+           '</span>';
+  }
+
   function stepsHtml(t){
     if(!t.steps || !t.steps.length) return "";
     var items = t.steps.map(function(s){ return '<li>'+stepText(s)+'</li>'; }).join("");
@@ -749,6 +794,7 @@
             '<span class="badge badge-'+t.type+'">'+meta.icon+' '+meta.label+'</span>'+
             '<label class="title" for="cbx-'+t.id+'">'+esc(t.title)+'</label>'+
             resourceHtml(t)+
+            fileHtml(t)+
             '<span class="lock-hint">🔒 finish the lessons above first</span>'+
             stepsHtml(t)+
           '</div>'+

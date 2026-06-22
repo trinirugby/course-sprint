@@ -115,6 +115,13 @@ with sync_playwright() as p:
     check("JDK steps panel opens with visible steps",
           first_steps.locator("ol.steps-list > li").first.is_visible())
 
+    # 16. Workspace file chips: 25 coding tasks point to their starter file
+    chips = page.locator(".file-chip")
+    check("25 task file chips render", chips.count() == 25)
+    greet_chip = page.locator("#card-u1-build-greetings .file-chip")
+    check("Greetings chip names its file",
+          "java-course/unit1/Greetings.java" in (greet_chip.text_content() or ""))
+
     page.screenshot(path=r"C:\Users\taylo\course-sprint\_verify_mobile.png", full_page=True)
     browser.close()
 
