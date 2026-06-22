@@ -94,6 +94,27 @@ with sync_playwright() as p:
             in_playlist += 1
     check("8 watch tasks wired into the playlist", in_playlist == 8)
 
+    # 14. Step-by-step instructions on every task
+    steps_panels = page.locator("details.steps").count()
+    check("every task has a steps panel (39)", steps_panels == 39)
+    total_li = page.locator("ol.steps-list > li").count()
+    check("steps have plenty of list items (>=120)", total_li >= 120)
+    code_count = page.locator("ol.steps-list code").count()
+    check("inline code snippets render as <code>", code_count >= 10)
+    # angle brackets inside snippets must render literally (not double-escaped):
+    # find the ArrayList<String> snippet and confirm its text is exactly that
+    al = page.locator("#card-u2-watch-arraylist ol.steps-list code",
+                      has_text="ArrayList").first
+    check("snippet shows real angle brackets (ArrayList<String>)",
+          (al.text_content() or "").strip() == "ArrayList<String>")
+
+    # 15. A steps panel actually opens (interactive)
+    first_steps = page.locator("#card-u1-install-jdk details.steps")
+    first_steps.locator("summary").click()
+    page.wait_for_timeout(120)
+    check("JDK steps panel opens with visible steps",
+          first_steps.locator("ol.steps-list > li").first.is_visible())
+
     page.screenshot(path=r"C:\Users\taylo\course-sprint\_verify_mobile.png", full_page=True)
     browser.close()
 

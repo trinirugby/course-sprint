@@ -184,6 +184,30 @@
   .lock-hint{display:block;margin-top:7px;font-size:.8rem;color:var(--locked);}
   .card:not(.locked) .lock-hint{display:none;}
 
+  /* ---------- Step-by-step (expandable per task) ---------- */
+  .steps{margin-top:10px;}
+  .steps>summary{
+    list-style:none;cursor:pointer;display:inline-flex;align-items:center;gap:6px;
+    font-family:"Space Grotesk",sans-serif;font-weight:600;font-size:.82rem;
+    color:var(--teal);padding:3px 0;-webkit-tap-highlight-color:transparent;
+  }
+  .steps>summary::-webkit-details-marker{display:none;}
+  .steps>summary::before{content:"▸";display:inline-block;transition:transform .2s var(--ease);}
+  .steps[open]>summary::before{transform:rotate(90deg);}
+  .steps>summary:hover{text-decoration:underline;}
+  .steps>summary:focus-visible{outline:3px solid var(--teal);outline-offset:3px;border-radius:6px;}
+  .steps[open]>summary{margin-bottom:8px;}
+  .steps-list{
+    margin:0;padding:2px 0 4px 1.25rem;
+    border-left:2px solid rgba(45,212,191,.25);
+  }
+  .steps-list li{font-size:.9rem;line-height:1.55;margin:6px 0;color:#D7DCF5;padding-left:4px;}
+  .steps-list li::marker{color:var(--teal);font-weight:700;}
+  .steps-list code{
+    font-family:ui-monospace,"Cascadia Code",Consolas,monospace;font-size:.85em;
+    background:rgba(125,211,252,.12);color:#Bfe8ff;padding:1px 5px;border-radius:5px;
+  }
+
   footer{color:var(--muted);font-size:.78rem;text-align:center;padding:26px 16px 10px;}
   footer .reset{color:var(--muted);text-decoration:underline;background:none;border:0;cursor:pointer;font:inherit;}
 
@@ -231,145 +255,391 @@
   // Task definitions are kept SEPARATE from progress so this list can be
   // edited later without wiping a student's saved ticks (progress is keyed by id).
   // `locked` is computed at render time, never stored.
+  // `steps` = beginner, click-by-click instructions shown in an expandable panel.
+  // Steps may contain <code>…</code> for inline code snippets.
   const TASKS = [
     /* ===== UNIT 1 — Basic Programming ===== */
     { id:"u1-install-jdk", unit:1, lesson:"Setup", type:"install",
       title:"Install the JDK (Java Development Kit)",
-      resource:{ label:"Adoptium Temurin JDK — download (Windows)", url:"https://adoptium.net/temurin/releases/?os=windows" } },
+      resource:{ label:"Adoptium Temurin JDK — download (Windows)", url:"https://adoptium.net/temurin/releases/?os=windows" },
+      steps:[
+        "Click the download link above — it opens the Adoptium Temurin page and detects Windows for you.",
+        "Choose the latest LTS version (e.g. 21 - LTS), Architecture: x64, Package Type: JDK, then click the <code>.msi</code> button to download.",
+        "Open the downloaded <code>.msi</code> file (check your Downloads folder or your browser's download bar).",
+        "Click Next. On the 'Custom Setup' screen, click the dropdown beside 'Set JAVA_HOME variable' and 'Add to PATH' and pick 'Will be installed on local hard drive'.",
+        "Click Next → Install → Yes (if Windows asks permission) → Finish.",
+        "Check it worked: press the Windows key, type <code>cmd</code>, press Enter, then type <code>java -version</code> and press Enter. You should see a version number.",
+      ] },
     { id:"u1-install-vscode", unit:1, lesson:"Setup", type:"install",
       title:"Install VS Code (your main editor)",
-      resource:{ label:"Visual Studio Code — download (Windows)", url:"https://code.visualstudio.com/download" } },
+      resource:{ label:"Visual Studio Code — download (Windows)", url:"https://code.visualstudio.com/download" },
+      steps:[
+        "Click the link above and press the big 'Windows' button (this gets the User Installer, x64).",
+        "Open the downloaded <code>.exe</code> from your Downloads folder.",
+        "Accept the agreement → Next. On 'Select Additional Tasks', tick 'Add to PATH' (leave the other boxes ticked too).",
+        "Click Next → Install → Finish. VS Code opens by itself.",
+      ] },
     { id:"u1-install-javapack", unit:1, lesson:"Setup", type:"install",
       title:"Add the Extension Pack for Java to VS Code",
-      resource:{ label:"Extension Pack for Java (Microsoft) — install", url:"https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-java-pack" } },
+      resource:{ label:"Extension Pack for Java (Microsoft) — install", url:"https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-java-pack" },
+      steps:[
+        "Open VS Code.",
+        "On the left toolbar click the Extensions icon (four little squares) — or press <code>Ctrl+Shift+X</code>.",
+        "In the search box type: Extension Pack for Java",
+        "Click the result by Microsoft, then click the blue Install button.",
+        "Wait about a minute while all 6 tools install. If it asks to reload, click Reload.",
+      ] },
     { id:"u1-install-netbeans", unit:1, lesson:"Setup", type:"install",
       title:"Optional: Install NetBeans (only for the visual GUI builder)",
-      resource:{ label:"Apache NetBeans — download (optional, for GUI projects)", url:"https://netbeans.apache.org/front/main/download/" } },
+      resource:{ label:"Apache NetBeans — download (optional, for GUI projects)", url:"https://netbeans.apache.org/front/main/download/" },
+      steps:[
+        "You can SKIP this for now — only the 2 GUI projects (My Calculator, cars.xml) benefit from it. Come back when you reach them.",
+        "Click the link, then on the download page choose the Windows installer (<code>.exe</code>) for the latest version.",
+        "Open the <code>.exe</code>, click Next through the installer, accept the license, then Install.",
+        "When you get to a GUI project, open it in NetBeans to drag-and-drop buttons instead of hand-coding them.",
+      ] },
 
     { id:"u1-watch-variables", unit:1, lesson:"Variables & Types", type:"watch",
       title:"Learn variables & data types",
-      resource:{ label:"Playlist #2 · Java variables", url:"https://www.youtube.com/watch?v=TGVLmr194DI&list=PLZPZq0r_RZOOj_NOZYq_R2PECIMglLemc" } },
+      resource:{ label:"Playlist #2 · Java variables", url:"https://www.youtube.com/watch?v=TGVLmr194DI&list=PLZPZq0r_RZOOj_NOZYq_R2PECIMglLemc" },
+      steps:[
+        "Click the video link above (it opens inside the course playlist).",
+        "Open VS Code next to the video and type each example as he shows it — don't just watch.",
+        "Goal: be able to make an <code>int</code>, <code>double</code>, <code>boolean</code>, and <code>String</code>, and print them with <code>System.out.println()</code>.",
+        "Tick this off once you can declare and print a variable on your own.",
+      ] },
 
     { id:"u1-watch-io", unit:1, lesson:"Input & Output", type:"watch",
       title:"Learn input & output (Scanner, println)",
-      resource:{ label:"Playlist #3 · User input in Java", url:"https://www.youtube.com/watch?v=RAthlOQUMkc&list=PLZPZq0r_RZOOj_NOZYq_R2PECIMglLemc" } },
+      resource:{ label:"Playlist #3 · User input in Java", url:"https://www.youtube.com/watch?v=RAthlOQUMkc&list=PLZPZq0r_RZOOj_NOZYq_R2PECIMglLemc" },
+      steps:[
+        "Click the video link above (opens in the playlist).",
+        "Code along: make a Scanner with <code>Scanner sc = new Scanner(System.in);</code>, read a line with <code>sc.nextLine()</code>, then print it back.",
+        "Goal: read whatever the user types and use it in your program.",
+        "Tick this off once you can ask a question and print the answer.",
+      ] },
     { id:"u1-build-greetings", unit:1, lesson:"Input & Output", type:"build",
       title:"Project: Greetings — read a name, print a greeting",
-      resource:{ label:"Build it in VS Code", url:null } },
+      resource:{ label:"Build it in VS Code", url:null },
+      steps:[
+        "In VS Code: File → New File, then Save As <code>Greetings.java</code> (the file name MUST match the class name).",
+        "Type the shell: <code>public class Greetings { public static void main(String[] args) { } }</code>",
+        "Inside main: make a Scanner, print 'What is your name?', and read the answer with <code>nextLine()</code>.",
+        "Print a greeting using the name, e.g. <code>System.out.println(\"Hello, \" + name + \"!\");</code>",
+        "Click the Run ▶ button that appears above <code>main</code>, type your name, and check the output.",
+      ] },
 
     { id:"u1-watch-ifelse", unit:1, lesson:"If / Else", type:"watch",
       title:"Learn if / else conditionals",
-      resource:{ label:"Playlist #7 · Java if statements", url:"https://www.youtube.com/watch?v=Q_ll-EKocuI&list=PLZPZq0r_RZOOj_NOZYq_R2PECIMglLemc" } },
+      resource:{ label:"Playlist #7 · Java if statements", url:"https://www.youtube.com/watch?v=Q_ll-EKocuI&list=PLZPZq0r_RZOOj_NOZYq_R2PECIMglLemc" },
+      steps:[
+        "Click the video link above (opens in the playlist).",
+        "Code along with <code>if</code>, <code>else if</code>, and <code>else</code> using a number or an age.",
+        "Goal: run different code depending on a condition (e.g. <code>if (age >= 18)</code>).",
+        "Tick this off when you can branch on a condition.",
+      ] },
     { id:"u1-build-rollercoaster", unit:1, lesson:"If / Else", type:"build",
       title:"Project: Roller Coaster Ride — height check with if/else",
-      resource:{ label:"Build it in VS Code", url:null } },
+      resource:{ label:"Build it in VS Code", url:null },
+      steps:[
+        "New file <code>RollerCoaster.java</code> with the class + main shell (file name matches the class name).",
+        "Ask the user for their height in cm and read it as an int with the Scanner.",
+        "Use if / else: if height is at least 140, print 'You can ride!', otherwise print 'Sorry, you're too short.'",
+        "Add an <code>else if</code> band for extra practice (e.g. a VIP height).",
+        "Run ▶ and test with a tall value and a short value.",
+      ] },
 
     { id:"u1-watch-loops", unit:1, lesson:"Loops", type:"watch",
       title:"Learn loops (while & for)",
-      resource:{ label:"Playlist #21 · Java while loops (for loops follow)", url:"https://www.youtube.com/watch?v=ZjHJrmYknrk&list=PLZPZq0r_RZOOj_NOZYq_R2PECIMglLemc" } },
+      resource:{ label:"Playlist #21 · Java while loops (for loops follow)", url:"https://www.youtube.com/watch?v=ZjHJrmYknrk&list=PLZPZq0r_RZOOj_NOZYq_R2PECIMglLemc" },
+      steps:[
+        "Click the video link above. The NEXT video in the playlist covers for-loops — watch both.",
+        "Code along: print the numbers 1 to 10 with a <code>while</code> loop, then do it again with a <code>for</code> loop.",
+        "Goal: repeat code a set number of times, and loop until a condition changes.",
+        "Tick this off when both loops make sense.",
+      ] },
     { id:"u1-build-sleeptimer", unit:1, lesson:"Loops", type:"build",
       title:"Project: Sleep Timer — count down with a loop",
-      resource:{ label:"Build it in VS Code", url:null } },
+      resource:{ label:"Build it in VS Code", url:null },
+      steps:[
+        "New file <code>SleepTimer.java</code> with the class + main shell.",
+        "Ask the user for a number of seconds and read it as an int.",
+        "Use a <code>for</code> loop counting DOWN from that number to 1, printing each number.",
+        "Optional: add <code>Thread.sleep(1000);</code> inside the loop to pause 1 second each time — VS Code will offer to add 'throws InterruptedException' to main; accept it.",
+        "After the loop, print 'Time's up!'. Run ▶ and test.",
+      ] },
 
     { id:"u1-watch-methods", unit:1, lesson:"Methods", type:"watch",
       title:"Learn methods",
-      resource:{ label:"Playlist #26 · Methods in Java", url:"https://www.youtube.com/watch?v=JKecvKiNX2I&list=PLZPZq0r_RZOOj_NOZYq_R2PECIMglLemc" } },
+      resource:{ label:"Playlist #26 · Methods in Java", url:"https://www.youtube.com/watch?v=JKecvKiNX2I&list=PLZPZq0r_RZOOj_NOZYq_R2PECIMglLemc" },
+      steps:[
+        "Click the video link above (opens in the playlist).",
+        "Code along: write a method like <code>static int add(int a, int b)</code> and call it from main.",
+        "Goal: put reusable code in its own method and call it with different inputs.",
+        "Tick this off when you can write a method that returns a value.",
+      ] },
 
     { id:"u1-watch-gui", unit:1, lesson:"Intro to GUI", type:"watch",
       title:"Intro to GUI (Java Swing)",
-      resource:{ label:"Bro Code — Java GUI (Swing) · not in the playlist", url:"https://www.youtube.com/watch?v=7GaAW-DdPuI" } },
+      resource:{ label:"Bro Code — Java GUI (Swing) · not in the playlist", url:"https://www.youtube.com/watch?v=7GaAW-DdPuI" },
+      steps:[
+        "Click the video link above (this one is OUTSIDE the playlist).",
+        "Watch how to make a window (<code>JFrame</code>) and add a button (<code>JButton</code>) and label (<code>JLabel</code>).",
+        "You don't need to build along fully — just understand JFrame, JButton, and JLabel.",
+        "If your teacher allows it, the optional NetBeans install gives a drag-and-drop builder that makes the next project much faster.",
+      ] },
     { id:"u1-build-calculator", unit:1, lesson:"Intro to GUI", type:"build",
       title:"Project: My Calculator — GUI calc (fix the decimal button!)",
-      resource:{ label:"GUI project — VS Code (hand-code Swing) or NetBeans for the visual builder", url:null } },
+      resource:{ label:"GUI project — VS Code (hand-code Swing) or NetBeans for the visual builder", url:null },
+      steps:[
+        "This is a GUI project. Fastest path: open NetBeans → File → New Project → Java with Ant → Java Application, then use the GUI builder to drag buttons onto a window.",
+        "Prefer VS Code? Make a <code>JFrame</code>, a text field for the display, and <code>JButton</code>s for 0-9, + - × ÷, =, and a decimal point.",
+        "Wire each number/operator button so clicking it adds its symbol to the display.",
+        "THE CLASSIC BUG — the decimal '.' button: make sure it actually appends a '.' AND that you block a second '.' in the same number. That's the 'decimal button fix'.",
+        "Test every button, especially '.', then tick this off.",
+      ] },
 
     /* ===== UNIT 2 — Arrays / Game Design ===== */
     { id:"u2-watch-arrays1d", unit:2, lesson:"1D Arrays", type:"watch",
       title:"Learn 1D arrays",
-      resource:{ label:"Playlist #31 · Java arrays", url:"https://www.youtube.com/watch?v=9dr2mHYYoug&list=PLZPZq0r_RZOOj_NOZYq_R2PECIMglLemc" } },
+      resource:{ label:"Playlist #31 · Java arrays", url:"https://www.youtube.com/watch?v=9dr2mHYYoug&list=PLZPZq0r_RZOOj_NOZYq_R2PECIMglLemc" },
+      steps:[
+        "Click the video link above (opens in the playlist).",
+        "Code along: make an int array, fill it, and loop through it to print each value.",
+        "Goal: store many values in ONE variable and reach them by index (<code>array[0]</code>, <code>array[1]</code>…).",
+        "Tick this off when you can loop over an array.",
+      ] },
     { id:"u2-build-integersum", unit:2, lesson:"1D Arrays", type:"build",
       title:"Project: Integer Sum — total the values in an array",
-      resource:{ label:"Build it in VS Code", url:null } },
+      resource:{ label:"Build it in VS Code", url:null },
+      steps:[
+        "New file <code>IntegerSum.java</code> with the class + main shell.",
+        "Make an int array of numbers, e.g. <code>int[] nums = {4, 8, 15, 16, 23, 42};</code>",
+        "Make <code>int total = 0;</code> then use a for loop to add every element to <code>total</code>.",
+        "Print the total and double-check it by adding the numbers by hand.",
+      ] },
 
     { id:"u2-watch-arrays2d", unit:2, lesson:"2D Arrays", type:"watch",
       title:"Learn 2D arrays",
-      resource:{ label:"Playlist #35 · Java 2D arrays", url:"https://www.youtube.com/watch?v=Qf3Nczxm2AY&list=PLZPZq0r_RZOOj_NOZYq_R2PECIMglLemc" } },
+      resource:{ label:"Playlist #35 · Java 2D arrays", url:"https://www.youtube.com/watch?v=Qf3Nczxm2AY&list=PLZPZq0r_RZOOj_NOZYq_R2PECIMglLemc" },
+      steps:[
+        "Click the video link above (opens in the playlist).",
+        "Code along: make a 2D array (a grid) and use a nested loop to print every cell.",
+        "Goal: understand rows and columns — <code>grid[row][col]</code>.",
+        "Tick this off when nested loops over a grid make sense.",
+      ] },
     { id:"u2-build-tictactoe", unit:2, lesson:"2D Arrays", type:"build",
       title:"Project: Tic Tac Toe — 2D-array game board",
-      resource:{ label:"Build it in VS Code", url:null } },
+      resource:{ label:"Build it in VS Code", url:null },
+      steps:[
+        "New file <code>TicTacToe.java</code> with the class + main shell.",
+        "Make a 3×3 board: <code>char[][] board = new char[3][3];</code> and fill every cell with '-' using nested loops.",
+        "Write a method that prints the board as 3 rows.",
+        "Let two players take turns: read a row and column, then place 'X' or 'O' in that cell.",
+        "Get the board + turns working first; THEN add win-checking (3 in a row). Build it in small pieces.",
+      ] },
 
     { id:"u2-watch-arraylist", unit:2, lesson:"ArrayLists", type:"watch",
       title:"Learn ArrayLists",
-      resource:{ label:"Playlist #56 · Java ArrayLists", url:"https://www.youtube.com/watch?v=wsTSREgCE5E&list=PLZPZq0r_RZOOj_NOZYq_R2PECIMglLemc" } },
+      resource:{ label:"Playlist #56 · Java ArrayLists", url:"https://www.youtube.com/watch?v=wsTSREgCE5E&list=PLZPZq0r_RZOOj_NOZYq_R2PECIMglLemc" },
+      steps:[
+        "Click the video link above (opens in the playlist).",
+        "Code along: make an <code>ArrayList<String></code>, add items, remove one, and loop through it.",
+        "Goal: a list that grows and shrinks on its own (unlike a fixed-size array).",
+        "Tick this off when you can add to and loop over an ArrayList.",
+      ] },
     { id:"u2-build-employee", unit:2, lesson:"ArrayLists", type:"build",
       title:"Project: Employee Records — store records in an ArrayList",
-      resource:{ label:"Build it in VS Code", url:null } },
+      resource:{ label:"Build it in VS Code", url:null },
+      steps:[
+        "New file <code>EmployeeRecords.java</code> with the class + main shell.",
+        "Make an <code>ArrayList<String></code> of employee names (or make an Employee class with name + id for extra credit).",
+        "Add a few employees with <code>.add(...)</code>, then print them all with a loop.",
+        "Add a menu in a while loop: let the user Add, Remove, or List employees until they choose Quit.",
+      ] },
 
     { id:"u2-read-review", unit:2, lesson:"Unit 2 Test", type:"read",
       title:"Review: arrays, 2D arrays & ArrayLists",
-      resource:{ label:"Go back over your notes & projects", url:null } },
+      resource:{ label:"Go back over your notes & projects", url:null },
+      steps:[
+        "Skim your Unit 2 notes and re-open the 3 projects you built.",
+        "Make sure you can: loop an array, use a 2D array (rows/cols), and add/remove from an ArrayList.",
+        "Re-run any project that felt shaky and fix anything that breaks.",
+        "Tick this off when you feel ready for the test.",
+      ] },
     { id:"u2-submit-test", unit:2, lesson:"Unit 2 Test", type:"submit",
       title:"Unit 2 Test",
-      resource:{ label:"Complete & submit the Unit 2 test", url:null } },
+      resource:{ label:"Complete & submit the Unit 2 test", url:null },
+      steps:[
+        "Open your course's Unit 2 test (from your teacher or course site).",
+        "Complete it — expect array, 2D array, and ArrayList questions.",
+        "Submit it the way your course requires.",
+        "Tick this off once it's handed in.",
+      ] },
 
     /* ===== UNIT 3 — Advanced Java ===== */
     { id:"u3-watch-recursion", unit:3, lesson:"Recursion", type:"watch",
       title:"Learn recursion",
-      resource:{ label:"Coding with John — Recursion full tutorial · not in the playlist", url:"https://www.youtube.com/watch?v=k-7jJP7QFEM" } },
+      resource:{ label:"Coding with John — Recursion full tutorial · not in the playlist", url:"https://www.youtube.com/watch?v=k-7jJP7QFEM" },
+      steps:[
+        "Click the video link above (this one is OUTSIDE the playlist).",
+        "Goal: understand a method that calls itself, and the 'base case' that stops it.",
+        "Code along with a simple example like factorial.",
+        "Tick this off when 'base case' and 'recursive call' make sense.",
+      ] },
     { id:"u3-build-fraction", unit:3, lesson:"Recursion", type:"build",
       title:"Project: Fraction Reducer — reduce fractions with recursion",
-      resource:{ label:"Build it in VS Code", url:null } },
+      resource:{ label:"Build it in VS Code", url:null },
+      steps:[
+        "New file <code>FractionReducer.java</code> with the class + main shell.",
+        "Ask for a numerator and a denominator (two ints).",
+        "Write a recursive method: <code>static int gcd(int a, int b){ return b == 0 ? a : gcd(b, a % b); }</code>",
+        "Divide both numbers by the gcd and print the reduced fraction (e.g. 8/12 → 2/3).",
+        "Run ▶ and test with a few fractions.",
+      ] },
 
     { id:"u3-watch-binarysearch", unit:3, lesson:"Binary Search", type:"watch",
       title:"Learn binary search",
-      resource:{ label:"Bro Code — Binary Search in 10 minutes · not in the playlist", url:"https://www.youtube.com/watch?v=xrMppTpoqdw" } },
+      resource:{ label:"Bro Code — Binary Search in 10 minutes · not in the playlist", url:"https://www.youtube.com/watch?v=xrMppTpoqdw" },
+      steps:[
+        "Click the video link above (OUTSIDE the playlist).",
+        "Goal: understand searching a SORTED list by repeatedly cutting it in half.",
+        "Watch the <code>low</code> / <code>high</code> / <code>mid</code> pattern carefully — you'll reuse it next.",
+        "Tick this off when the halving idea clicks.",
+      ] },
     { id:"u3-build-booksearch", unit:3, lesson:"Binary Search", type:"build",
       title:"Project: Book Search — find a title with binary search",
-      resource:{ label:"Build it in VS Code", url:null } },
+      resource:{ label:"Build it in VS Code", url:null },
+      steps:[
+        "New file <code>BookSearch.java</code> with the class + main shell.",
+        "Make a SORTED String array of book titles (alphabetical order is required for binary search).",
+        "Ask the user for a title to find.",
+        "Implement binary search with <code>low</code>, <code>high</code>, and <code>mid</code> to find the title's index, or report 'not found'.",
+        "Test with a title that exists and one that doesn't.",
+      ] },
 
     { id:"u3-watch-sorting", unit:3, lesson:"Sorting", type:"watch",
       title:"Learn sorting routines",
-      resource:{ label:"Bro Code — Bubble Sort in 7 minutes · not in the playlist", url:"https://www.youtube.com/watch?v=Dv4qLJcxus8" } },
+      resource:{ label:"Bro Code — Bubble Sort in 7 minutes · not in the playlist", url:"https://www.youtube.com/watch?v=Dv4qLJcxus8" },
+      steps:[
+        "Click the video link above (OUTSIDE the playlist).",
+        "Goal: understand how bubble sort swaps neighbours until the array is in order.",
+        "Watch the nested-loop + swap pattern.",
+        "Tick this off when you can picture the swaps.",
+      ] },
     { id:"u3-build-sorting", unit:3, lesson:"Sorting", type:"build",
       title:"Project: implement a sorting routine",
-      resource:{ label:"Build it in VS Code", url:null } },
+      resource:{ label:"Build it in VS Code", url:null },
+      steps:[
+        "New file <code>SortDemo.java</code> with the class + main shell.",
+        "Make an UNSORTED int array.",
+        "Implement bubble sort: nested for loops that swap <code>array[j]</code> and <code>array[j+1]</code> when they're out of order.",
+        "Print the array BEFORE and AFTER sorting to prove it works.",
+      ] },
 
     { id:"u3-watch-xml", unit:3, lesson:"XML", type:"watch",
       title:"Reading XML in Java",
-      resource:{ label:"Read an XML file in Java (DOM parser) · not in the playlist", url:"https://www.youtube.com/watch?v=Ejb91k2nlRI" } },
+      resource:{ label:"Read an XML file in Java (DOM parser) · not in the playlist", url:"https://www.youtube.com/watch?v=Ejb91k2nlRI" },
+      steps:[
+        "Click the video link above (OUTSIDE the playlist).",
+        "Goal: understand reading an XML file with a DOM parser — elements, tags, and attributes.",
+        "Don't memorise it — you'll copy the same pattern in the project.",
+        "Tick this off when you've seen the full read-an-XML-file flow.",
+      ] },
     { id:"u3-build-carsxml", unit:3, lesson:"XML", type:"build",
       title:"Project: cars.xml GUI — load car data from XML",
-      resource:{ label:"GUI project — VS Code (hand-code Swing) or NetBeans for the visual builder", url:null } },
+      resource:{ label:"GUI project — VS Code (hand-code Swing) or NetBeans for the visual builder", url:null },
+      steps:[
+        "Make a file <code>cars.xml</code> with a few <code><car></code> entries (make, model, year).",
+        "This is a GUI project: easiest in NetBeans' GUI builder; in VS Code you'll hand-code a small Swing window.",
+        "Use a DOM parser (<code>DocumentBuilder</code>) to read <code>cars.xml</code> into a list of cars.",
+        "Show the car data in your window (a <code>JTextArea</code> or a table).",
+        "Run it and confirm the cars from the XML appear on screen.",
+      ] },
 
     { id:"u3-read-careers", unit:3, lesson:"Careers", type:"read",
       title:"Explore Java careers & job search",
-      resource:{ label:"Research Java career paths & job postings", url:null } },
+      resource:{ label:"Research Java career paths & job postings", url:null },
+      steps:[
+        "Spend ~15 minutes searching 'junior Java developer' on a job site.",
+        "Note 3 real job postings and the skills they ask for.",
+        "Write down 2 skills from THIS course that show up in those postings.",
+        "Tick this off — it's usually a short reflection task.",
+      ] },
 
     { id:"u3-read-review", unit:3, lesson:"Unit 3 Test", type:"read",
       title:"Review: recursion, search, sorting & XML",
-      resource:{ label:"Go back over your notes & projects", url:null } },
+      resource:{ label:"Go back over your notes & projects", url:null },
+      steps:[
+        "Review your Unit 3 notes and projects: recursion, binary search, sorting, XML.",
+        "Make sure you can explain a base case and the low/high/mid search pattern.",
+        "Re-run anything that felt unclear.",
+        "Tick this off when you're ready for the test.",
+      ] },
     { id:"u3-submit-test", unit:3, lesson:"Unit 3 Test", type:"submit",
       title:"Unit 3 Test",
-      resource:{ label:"Complete & submit the Unit 3 test", url:null } },
+      resource:{ label:"Complete & submit the Unit 3 test", url:null },
+      steps:[
+        "Open your course's Unit 3 test.",
+        "Complete it — expect recursion, search, sorting, and XML questions.",
+        "Submit it the way your course requires, then tick this off.",
+      ] },
 
     /* ===== UNIT 4 — Software Cycle / Summative ===== */
     { id:"u4-watch-sdlc", unit:4, lesson:"Final Summative Project", type:"watch",
       title:"Intro to the software development cycle",
-      resource:{ label:"Bro Code — Software Development Lifecycle (9 min) · not in the playlist", url:"https://www.youtube.com/watch?v=i-QyW8D3ei0" } },
+      resource:{ label:"Bro Code — Software Development Lifecycle (9 min) · not in the playlist", url:"https://www.youtube.com/watch?v=i-QyW8D3ei0" },
+      steps:[
+        "Click the video link above (OUTSIDE the playlist).",
+        "Goal: learn the stages — plan, design, build, test — that you'll follow for your final project.",
+        "Keep it short; this is just the background for your summative.",
+        "Tick this off when you know the four stages.",
+      ] },
     { id:"u4-read-idea", unit:4, lesson:"Final Summative Project", type:"read",
       title:"Choose your final project idea",
-      resource:{ label:"Pick a project & write a one-line goal", url:null } },
+      resource:{ label:"Pick a project & write a one-line goal", url:null },
+      steps:[
+        "Pick something you can actually finish: a quiz game, a to-do list, a number-guessing game, or a calculator.",
+        "Reuse skills you already have (input, loops, arrays/ArrayLists).",
+        "Write ONE sentence: 'My program will ___ for ___.'",
+        "If you can, check the size of the idea with your teacher, then tick this off.",
+      ] },
     { id:"u4-build-design", unit:4, lesson:"Final Summative Project", type:"build",
       title:"Design & development — plan it (flowchart / pseudocode)",
-      resource:{ label:"Sketch your design", url:null } },
+      resource:{ label:"Sketch your design", url:null },
+      steps:[
+        "On paper or in a doc, list everything your program needs to do (its features).",
+        "Sketch the flow: what happens first, the menu/loop in the middle, and when it ends (a flowchart or simple numbered steps).",
+        "List the variables and arrays/ArrayLists you'll need.",
+        "Tick this off once you have a clear plan to follow.",
+      ] },
     { id:"u4-build-implement", unit:4, lesson:"Final Summative Project", type:"build",
       title:"Implementation — build your project",
-      resource:{ label:"Build it in VS Code", url:null } },
+      resource:{ label:"Build it in VS Code", url:null },
+      steps:[
+        "In VS Code, create your project file(s) and the main method.",
+        "Build ONE feature at a time from your design — run it after each piece so bugs stay small.",
+        "Use methods to keep the code tidy and avoid repeating yourself.",
+        "Tick this off when all your planned features are coded.",
+      ] },
     { id:"u4-build-testing", unit:4, lesson:"Final Summative Project", type:"build",
       title:"Testing & verification — make sure it works",
-      resource:{ label:"Test every feature", url:null } },
+      resource:{ label:"Test every feature", url:null },
+      steps:[
+        "Run your program and try EVERY feature, including weird inputs (empty, huge, wrong type).",
+        "Fix any crashes or wrong outputs you find.",
+        "Ask a friend to try it — they'll find things you won't.",
+        "Tick this off when it runs cleanly from start to finish.",
+      ] },
     { id:"u4-submit-summative", unit:4, lesson:"Final Summative Project", type:"submit",
       title:"Submit your final summative",
-      resource:{ label:"Hand in your final project", url:null } },
+      resource:{ label:"Hand in your final project", url:null },
+      steps:[
+        "Do a final read-through and delete any leftover test code.",
+        "Put your name and a short comment explaining the program at the top of the file.",
+        "Submit the way your course requires (upload the <code>.java</code> files or the whole project folder).",
+        "Tick this off — you've finished the course! 🎉",
+      ] },
   ];
 
   const UNITS = [
@@ -433,6 +703,20 @@
     return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c];
   }); }
 
+  // Steps may contain inline <code>…</code> spans. Everything is HTML-escaped;
+  // only the <code> wrapper is emitted as a real tag (its contents stay escaped,
+  // so snippets like ArrayList<String> display correctly).
+  function stepText(s){
+    var out = "", last = 0, m;
+    var re = /<code>([\s\S]*?)<\/code>/g;
+    while((m = re.exec(s))){
+      out += esc(s.slice(last, m.index)) + "<code>" + esc(m[1]) + "</code>";
+      last = re.lastIndex;
+    }
+    out += esc(s.slice(last));
+    return out;
+  }
+
   function resourceHtml(t){
     if(!t.resource) return "";
     var r = t.resource;
@@ -440,6 +724,15 @@
       return '<a class="res" href="'+esc(r.url)+'" target="_blank" rel="noopener noreferrer">'+esc(r.label)+' ↗</a>';
     }
     return '<span class="res res-muted">'+esc(r.label)+'</span>';
+  }
+
+  function stepsHtml(t){
+    if(!t.steps || !t.steps.length) return "";
+    var items = t.steps.map(function(s){ return '<li>'+stepText(s)+'</li>'; }).join("");
+    return '<details class="steps">'+
+             '<summary>Show me the steps</summary>'+
+             '<ol class="steps-list">'+items+'</ol>'+
+           '</details>';
   }
 
   function cardHtml(t){
@@ -457,6 +750,7 @@
             '<label class="title" for="cbx-'+t.id+'">'+esc(t.title)+'</label>'+
             resourceHtml(t)+
             '<span class="lock-hint">🔒 finish the lessons above first</span>'+
+            stepsHtml(t)+
           '</div>'+
         '</div>'+
       '</div>';
